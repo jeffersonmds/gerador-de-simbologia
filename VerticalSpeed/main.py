@@ -2,12 +2,6 @@ import pygame
 """import math"""
 """import gerador_simbologia"""
 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GREEN = (0, 255, 0)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-
 PI = 3.141592653
 pygame.init()
 
@@ -26,9 +20,7 @@ seta = pygame.image.load("seta_vsi.png")
 
 done = False
 angle = 0
-descendo = True
-velocidade = 50
-
+# velocidade = 50
 
 def rotaciona_vsi(image, angle):
     orig_rect = image.get_rect()
@@ -38,17 +30,8 @@ def rotaciona_vsi(image, angle):
     rot_image = rot_image.subsurface(rot_rect).copy()
     return rot_image
 
-while not done:
-    for event in pygame.event.get():
-       if event.type == pygame.QUIT:
-           done = True
 
-    # Copy image to screen:
-    screen.blit(background_image, background_position)
-    screen.blit(rotaciona_vsi(seta, angle), background_position)
-
-
-def simbologia(label):
+def simbologia(label: list) -> object:
     value = [0, 0, 0, 0]
     list(reversed(label))
     """att = label[14:28]"""
@@ -94,13 +77,13 @@ def simbologia(label):
     return results
 
 
-inf = "011010001000000000PPPP0000001000"
+inf = "011010001000000000PPPP0000001000".split()
 
 list(reversed(inf))
 if inf[0:7] == [0, 0, 0, 1, 0, 0, 0, 0]:
-    simbologia(inf)
+    angle = simbologia(inf)
 
-keys = pygame.key.get_pressed()
+"""keys = pygame.key.get_pressed()
 if keys[pygame.K_UP]:
     angle = angle + .9
     descendo = False
@@ -110,13 +93,19 @@ elif keys[pygame.K_DOWN]:
 elif descendo == True:
     angle = angle - .9
 else:
-    angle = angle + .9
+    angle = angle + .9"""
+"""
+while not done:
+    for event in pygame.event.get():
+       if event.type == pygame.QUIT:
+           done = True
+"""
+    # Copy image to screen:
+    screen.blit(background_image, background_position)
+    screen.blit(rotaciona_vsi(seta, angle), background_position)
 
-   # If we have done a full sweep, reset the angle to 0
-   #if angle > 2 * PI:
-   #    angle = angle - 2 * PI
-pygame.display.flip()
-clock.tick(velocidade)
+# pygame.display.flip()
+# clock.tick(velocidade)
 
 pygame.quit()
 
