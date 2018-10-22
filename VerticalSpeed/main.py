@@ -32,7 +32,8 @@ def rotaciona_vsi(image, angle):
     return rot_image
 
 
-def simbologia(label: list) -> object:
+def simbologia(label):
+    res = 0
     value = [0, 0, 0, 0]
     list(reversed(label))
     """att = label[14:28]"""
@@ -44,6 +45,7 @@ def simbologia(label: list) -> object:
         value[3] = value[3] + 4
     if label[17] == '1':
         value[3] = value[3] + 8
+    res += value[3]
 
     if label[18] == '1':
         value[2] = value[2] + 1
@@ -53,6 +55,7 @@ def simbologia(label: list) -> object:
         value[2] = value[2] + 4
     if label[21] == '1':
         value[2] = value[2] + 8
+    res += value[2] * 10
 
     if label[22] == '1':
         value[1] = value[1] + 1
@@ -62,6 +65,7 @@ def simbologia(label: list) -> object:
         value[1] = value[1] + 4
     if label[25] == '1':
         value[1] = value[1] + 8
+    res += value[1] * 100
 
     if label[26] == '1':
         value[0] = value[0] + 1
@@ -69,20 +73,24 @@ def simbologia(label: list) -> object:
         value[0] = value[0] + 2
     if label[28] == '1':
         value[0] = value[0] + 4
+    res += value[0] * 1000
 
-    results = list(map(int, value))
-    results.join()
-    results = results / 2
-    if label[29:30] == [0, 0]:
-        results = results * (-1)
-    return results
+    res = res / 2
+    return res
+
+
+def negativ(label, res):
+    if label[29] == '1' and label[30] == '1':
+        res = res * (-1)
+    return res
 
 
 inf = "011010001000000000PPPP0000001000".split()
 
 list(reversed(inf))
-if inf[0:7] == [0, 0, 0, 1, 0, 0, 0, 0]:
+if inf[0:8] == ['0', '0', '0', '1', '0', '0', '0', '0']:
     angle = simbologia(inf)
+    angle = negativ(inf, angle)
 
 """keys = pygame.key.get_pressed()
 if keys[pygame.K_UP]:

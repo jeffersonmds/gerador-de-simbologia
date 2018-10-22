@@ -51,20 +51,13 @@ def simbologia(label):
 
 
 def negativ(label, res):
-    if label[29:30] == ['1', '1']:
+    if label[29] == '1' and label[30] == '1':
         res = res * (-1)
     return res
 
 
 inf = "011010001000000000PPPP0000001000"
 inf = list(reversed(inf))
-
-if inf[0:7] == ['0', '0', '0', '1', '0', '0', '0']:
+if inf[0:8] == ['0', '0', '0', '1', '0', '0', '0', '0']:
     angle = simbologia(inf)
     angle = negativ(inf, angle)
-
-print(inf)
-print(inf[29:30])
-print(inf[29])
-print(inf[30])
-print(angle)
