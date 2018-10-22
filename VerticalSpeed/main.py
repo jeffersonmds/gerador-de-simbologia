@@ -1,5 +1,6 @@
 import pygame
-import math
+"""import math"""
+"""import gerador_simbologia"""
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -28,6 +29,7 @@ angle = 0
 descendo = True
 velocidade = 50
 
+
 def rotaciona_vsi(image, angle):
     orig_rect = image.get_rect()
     rot_image = pygame.transform.rotate(image, angle)
@@ -37,79 +39,84 @@ def rotaciona_vsi(image, angle):
     return rot_image
 
 while not done:
-   for event in pygame.event.get():
+    for event in pygame.event.get():
        if event.type == pygame.QUIT:
            done = True
 
-   # Copy image to screen:
-   screen.blit(background_image, background_position)
-   screen.blit(rotaciona_vsi(seta, angle), background_position)
-
-   # Get the current mouse position. This returns the position
-   # as a list of two numbers.
-   #player_position = pygame.mouse.get_pos()
-   #x = player_position[0]
-   #y = player_position[1]
-
-   # Copy image to screen:
-   #screen.blit(player_image, [x, y])
-
-   # Draw the outline of a circle to 'sweep' the line around
-   #box_dimensions = [45, 2, 255, 255]
-   #pygame.draw.ellipse(screen, GREEN, box_dimensions, 2)
-   """
-   x = 127.5 * math.sin(angle) + 200
-   y = 127.5 * math.cos(angle) + 200
-   # Draw the line from the center to the calculated end spot
-   pygame.draw.line(screen, WHITE, [200, 200], [x, y], 5)
-   #screen.blit(seta1, [x, y])"""
+    # Copy image to screen:
+    screen.blit(background_image, background_position)
+    screen.blit(rotaciona_vsi(seta, angle), background_position)
 
 
+def simbologia(label):
+    value = [0, 0, 0, 0]
+    list(reversed(label))
+    """att = label[14:28]"""
+    if label[14] == '1':
+        value[3] = value[3] + 1
+    if label[15] == '1':
+        value[3] = value[3] + 2
+    if label[16] == '1':
+        value[3] = value[3] + 4
+    if label[17] == '1':
+        value[3] = value[3] + 8
+
+    if label[18] == '1':
+        value[2] = value[2] + 1
+    if label[19] == '1':
+        value[2] = value[2] + 2
+    if label[20] == '1':
+        value[2] = value[2] + 4
+    if label[21] == '1':
+        value[2] = value[2] + 8
+
+    if label[22] == '1':
+        value[1] = value[1] + 1
+    if label[23] == '1':
+        value[1] = value[1] + 2
+    if label[24] == '1':
+        value[1] = value[1] + 4
+    if label[25] == '1':
+        value[1] = value[1] + 8
+
+    if label[26] == '1':
+        value[0] = value[0] + 1
+    if label[27] == '1':
+        value[0] = value[0] + 2
+    if label[28] == '1':
+        value[0] = value[0] + 4
+
+    results = list(map(int, value))
+    results.join()
+    results = results / 2
+    if label[29:30] == [0, 0]:
+        results = results * (-1)
+    return results
 
 
-   """
-   keys = pygame.key.get_pressed()
-   if keys[pygame.K_UP]:
-       if descendo == True:
-           if velocidade - 10 == 0:
-               velocidade = 10;
-               descendo = False
-               angle = angle - .01
-       else:
-           velocidade -= 10
-           angle = angle + .01
-   else:
-       if descendo == True:
-           angle = angle - .01    # Decrease the angle by 0.03 radians
-           #flag = 1;
-       else:
-           angle = angle + .01
+inf = "011010001000000000PPPP0000001000"
 
-   if keys[pygame.K_DOWN]:
-       velocidade += 10
-   else:
-       if flag == 0:
-           angle = angle - .01    # Decrease the angle by 0.03 radians
-           flag = 1;"""
+list(reversed(inf))
+if inf[0:7] == [0, 0, 0, 1, 0, 0, 0, 0]:
+    simbologia(inf)
 
-   keys = pygame.key.get_pressed()
-   if keys[pygame.K_UP]:
-       angle = angle + .9
-       descendo = False
-   elif keys[pygame.K_DOWN]:
-       angle = angle - .9
-       descendo = True
-   elif descendo == True:
-       angle = angle - .9
-   else:
-       angle = angle + .9
+keys = pygame.key.get_pressed()
+if keys[pygame.K_UP]:
+    angle = angle + .9
+    descendo = False
+elif keys[pygame.K_DOWN]:
+    angle = angle - .9
+    descendo = True
+elif descendo == True:
+    angle = angle - .9
+else:
+    angle = angle + .9
 
    # If we have done a full sweep, reset the angle to 0
    #if angle > 2 * PI:
    #    angle = angle - 2 * PI
-
-   pygame.display.flip()
-   clock.tick(velocidade)
+pygame.display.flip()
+clock.tick(velocidade)
 
 pygame.quit()
 
