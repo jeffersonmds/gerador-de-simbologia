@@ -22,6 +22,7 @@ done = False
 angle = 0
 # velocidade = 50
 
+
 def rotaciona_vsi(image, angle):
     orig_rect = image.get_rect()
     rot_image = pygame.transform.rotate(image, angle)
@@ -94,13 +95,13 @@ elif descendo == True:
     angle = angle - .9
 else:
     angle = angle + .9"""
-"""
+
 while not done:
     for event in pygame.event.get():
        if event.type == pygame.QUIT:
            done = True
-"""
-    # Copy image to screen:
+
+# Copy image to screen:
     screen.blit(background_image, background_position)
     screen.blit(rotaciona_vsi(seta, angle), background_position)
 
