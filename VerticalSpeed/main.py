@@ -1,8 +1,9 @@
 import pygame
+import pandas as pd
+
 """import math"""
 """import gerador_simbologia"""
 
-PI = 3.141592653
 pygame.init()
 
 # 400x400 sized screen
@@ -20,6 +21,7 @@ seta = pygame.image.load("seta_vsi.png")
 
 done = False
 angle = 0
+cont = 0
 # velocidade = 50
 
 
@@ -85,36 +87,30 @@ def negativ(label, res):
     return res
 
 
-inf = "011010001000000000PPPP0000001000".split()
+def next():
+    dados = pd.read_csv("entrada_de_dados.csv")
+    print(dados)
+    inf = list(reversed(inf))
+    return inf[cont]
 
-list(reversed(inf))
-if inf[0:8] == ['0', '0', '0', '1', '0', '0', '0', '0']:
-    angle = simbologia(inf)
-    angle = negativ(inf, angle)
-
-"""keys = pygame.key.get_pressed()
-if keys[pygame.K_UP]:
-    angle = angle + .9
-    descendo = False
-elif keys[pygame.K_DOWN]:
-    angle = angle - .9
-    descendo = True
-elif descendo == True:
-    angle = angle - .9
-else:
-    angle = angle + .9"""
 
 while not done:
     for event in pygame.event.get():
-       if event.type == pygame.QUIT:
-           done = True
+        if event.type == pygame.QUIT:
+            done = True
 
-# Copy image to screen:
+    inf = next()
+    cont += 1
+
+    if inf[0:8] == ['0', '0', '0', '1', '0', '0', '0', '0']:
+        angle = simbologia(inf)
+        angle = negativ(inf, angle)
+
     screen.blit(background_image, background_position)
     screen.blit(rotaciona_vsi(seta, angle), background_position)
 
-# pygame.display.flip()
-# clock.tick(velocidade)
+    pygame.display.flip()
+    clock.tick(10)
 
 pygame.quit()
 
