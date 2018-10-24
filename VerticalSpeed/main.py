@@ -1,5 +1,5 @@
 import pygame
-import pandas as pd
+import csv
 
 """import math"""
 """import gerador_simbologia"""
@@ -94,23 +94,30 @@ def next():
     return inf[cont]
 
 
+csv_inf = open("entrada_de_dados2.csv")
+file = csv.reader(csv_inf)
+inf = []
+for row in file:
+    inf.append(list(reversed(row[0].replace('\t', ''))))
+
+
 while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
 
-    inf = next()
+    if inf[cont][0:8] == ['0', '0', '0', '1', '0', '0', '0', '0']:
+        angle = simbologia(inf[cont])
+        angle = negativ(inf[cont], angle)
     cont += 1
-
-    if inf[0:8] == ['0', '0', '0', '1', '0', '0', '0', '0']:
-        angle = simbologia(inf)
-        angle = negativ(inf, angle)
-
     screen.blit(background_image, background_position)
-    screen.blit(rotaciona_vsi(seta, angle), background_position)
-
+    screen.blit(rotaciona_vsi(seta, angle * (-1)), background_position)
+    print(angle, " ",cont)
     pygame.display.flip()
-    clock.tick(10)
+    clock.tick(1)
+
+    if cont == len(inf):
+        done = True
 
 pygame.quit()
 

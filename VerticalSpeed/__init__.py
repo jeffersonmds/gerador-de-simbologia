@@ -1,6 +1,36 @@
-import string
+import pygame
+import csv
 
-angle = 1
+"""import math"""
+"""import gerador_simbologia"""
+
+pygame.init()
+
+# 400x400 sized screen
+screen = pygame.display.set_mode([400, 400])
+
+# This sets the name of the window
+pygame.display.set_caption('Indicador de Velocidade Vertical')
+
+clock = pygame.time.Clock()
+background_position = [0, 0]
+
+# Load and set up graphics.
+background_image = pygame.image.load("indicador.png")#.convert()
+seta = pygame.image.load("seta_vsi.png")
+
+done = False
+angle = 0
+cont = 0
+
+
+def rotaciona_vsi(image, angle):
+    orig_rect = image.get_rect()
+    rot_image = pygame.transform.rotate(image, angle)
+    rot_rect = orig_rect.copy()
+    rot_rect.center = rot_image.get_rect().center
+    rot_image = rot_image.subsurface(rot_rect).copy()
+    return rot_image
 
 
 def simbologia(label):
@@ -46,7 +76,7 @@ def simbologia(label):
         value[0] = value[0] + 4
     res += value[0] * 1000
 
-    res = res / 2
+    res = res / 100
     return res
 
 
@@ -56,8 +86,38 @@ def negativ(label, res):
     return res
 
 
-inf = "011010001000000000PPPP0000001000"
-inf = list(reversed(inf))
-if inf[0:8] == ['0', '0', '0', '1', '0', '0', '0', '0']:
-    angle = simbologia(inf)
-    angle = negativ(inf, angle)
+"""
+def next():
+    dados = pd.read_csv("entrada_de_dados.csv")
+    print(dados)
+    inf = list(reversed(inf))
+    return inf[cont]"""
+
+
+csv_inf = open("entrada_de_dados.csv")
+file = csv.reader(csv_inf)
+inf = []
+for row in file:
+    inf.append(list(reversed(row[0].replace('\t', ''))))
+
+
+while not done:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            done = True
+
+    if inf[cont][0:8] == ['0', '0', '0', '1', '0', '0', '0', '0']:
+        angle = simbologia(inf[cont])
+        angle = negativ(inf[cont], angle)
+    cont += 1
+    screen.blit(background_image, background_position)
+    screen.blit(rotaciona_vsi(seta, angle * (-1)), background_position)
+    print(angle, " ",cont)
+    pygame.display.flip()
+    clock.tick(500)
+
+    if cont == len(inf):
+        done = True
+
+pygame.quit()
+

@@ -1,6 +1,7 @@
 import pygame
 import math
 
+
 class GeradorDeSimbologia:
 
     def simbologia(label):
@@ -49,8 +50,8 @@ class GeradorDeSimbologia:
             return results
 
 
-    inf = "011010001000000000PPPP0000001000"
-
+    dados = pd.read_csv("entrada_de_dados.csv")
+    print(dados)
     list(reversed(inf))
     if inf[0:7] == [0, 0, 0, 1, 0, 0, 0, 0]:
             simbologia(inf)
