@@ -1,28 +1,7 @@
 import pygame
 import csv
-
-"""import math"""
-"""import gerador_simbologia"""
-
-pygame.init()
-
-# 400x400 sized screen
-screen = pygame.display.set_mode([400, 400])
-
-# This sets the name of the window
-pygame.display.set_caption('Indicador de Velocidade Vertical')
-
-clock = pygame.time.Clock()
-background_position = [0, 0]
-
-# Load and set up graphics.
-background_image = pygame.image.load("indicador.png")#.convert()
-seta = pygame.image.load("seta_vsi.png")
-
-done = False
-angle = 0
-cont = 0
-# velocidade = 50
+import socket
+import pickle
 
 
 def rotaciona_vsi(image, angle):
@@ -77,7 +56,7 @@ def simbologia(label):
         value[0] = value[0] + 4
     res += value[0] * 1000
 
-    res = res / 2
+    res = res / 100
     return res
 
 
@@ -87,37 +66,51 @@ def negativ(label, res):
     return res
 
 
-def next():
-    dados = pd.read_csv("entrada_de_dados.csv")
-    print(dados)
-    inf = list(reversed(inf))
-    return inf[cont]
+def client_program():
+    angle = 0
+    cont = 0
+    done = False
+    host = '127.0.0.1'  # as both code is running on same pc
+    port = 5000  # socket server port number
 
+    client_socket = socket.socket()  # instantiate
+    client_socket.connect((host, port))  # connect to the server
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+        data = pickle.loads(client_socket.recv(8192))
+        print (data)
+        if data[0:8] == ['0', '0', '0', '1', '0', '0', '0', '0']:
+            angle = simbologia(data)
+            angle = negativ(data, angle)
+        screen.blit(background_image, background_position)
+        screen.blit(rotaciona_vsi(seta, angle * (-1)), background_position)
+        print(angle, " ", cont)
+        cont += 1
+        pygame.display.flip()
+        clock.tick(10000)
 
-csv_inf = open("entrada_de_dados2.csv")
-file = csv.reader(csv_inf)
-inf = []
-for row in file:
-    inf.append(list(reversed(row[0].replace('\t', ''))))
-
-
-while not done:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if cont == 10000:
             done = True
 
-    if inf[cont][0:8] == ['0', '0', '0', '1', '0', '0', '0', '0']:
-        angle = simbologia(inf[cont])
-        angle = negativ(inf[cont], angle)
-    cont += 1
-    screen.blit(background_image, background_position)
-    screen.blit(rotaciona_vsi(seta, angle * (-1)), background_position)
-    print(angle, " ",cont)
-    pygame.display.flip()
-    clock.tick(1)
+    pygame.quit()
+    client_socket.close()  # close the connection
 
-    if cont == len(inf):
-        done = True
 
-pygame.quit()
+if __name__ == '__main__':
+    pygame.init()
 
+    # 400x400 sized screen
+    screen = pygame.display.set_mode([400, 400])
+
+    # This sets the name of the window
+    pygame.display.set_caption('Indicador de Velocidade Vertical')
+
+    clock = pygame.time.Clock()
+    background_position = [0, 0]
+
+    # Load and set up graphics.
+    background_image = pygame.image.load("indicador.png")  # .convert()
+    seta = pygame.image.load("seta_vsi.png")
+    client_program()
