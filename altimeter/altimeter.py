@@ -1,36 +1,8 @@
 import pygame
+import csv
+import socket
+import pickle
 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GREEN = (0, 255, 0)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-
-PI = 3.141592653
-pygame.init()
-
-# 600x600 sized screen
-screen = pygame.display.set_mode([600, 600])
-
-# This sets the name of the window
-pygame.display.set_caption('Altimetro')
-
-clock = pygame.time.Clock()
-
-# Set positions of graphics
-background_position = [0, 0]
-
-# Load and set up graphics.
-background_image = pygame.image.load("background_altimeter.png").convert()
-seta3 = pygame.image.load("seta3.png")#.convert()
-seta1 = pygame.image.load("seta1.png")#.convert()
-seta2 = pygame.image.load("seta2.png")#.convert()
-
-seta1.set_colorkey(BLACK)
-
-done = False
-angle = 0
-descendo = True
 
 def rotaciona_alt(image, angle):
     orig_rect = image.get_rect()
@@ -40,81 +12,107 @@ def rotaciona_alt(image, angle):
     rot_image = rot_image.subsurface(rot_rect).copy()
     return rot_image
 
-while not done:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+
+def simbologia(label):
+    res = 0
+    value = [0, 0, 0, 0, 0]
+    list(reversed(label))
+    """10 ao 13"""
+    if label[10] == '1':
+        value[4] = value[4] + 1
+    if label[11] == '1':
+        value[4] = value[4] + 2
+    if label[12] == '1':
+        value[4] = value[4] + 4
+    if label[13] == '1':
+        value[4] = value[4] + 8
+    res += value[4]
+
+    if label[14] == '1':
+        value[3] = value[3] + 1
+    if label[15] == '1':
+        value[3] = value[3] + 2
+    if label[16] == '1':
+        value[3] = value[3] + 4
+    if label[17] == '1':
+        value[3] = value[3] + 8
+    res += value[3] * 10
+
+    if label[18] == '1':
+        value[2] = value[2] + 1
+    if label[19] == '1':
+        value[2] = value[2] + 2
+    if label[20] == '1':
+        value[2] = value[2] + 4
+    if label[21] == '1':
+        value[2] = value[2] + 8
+    res += value[2] * 100
+
+    if label[22] == '1':
+        value[1] = value[1] + 1
+    if label[23] == '1':
+        value[1] = value[1] + 2
+    if label[24] == '1':
+        value[1] = value[1] + 4
+    if label[25] == '1':
+        value[1] = value[1] + 8
+    res += value[1] * 1000
+
+    if label[26] == '1':
+        value[0] = value[0] + 1
+    if label[27] == '1':
+        value[0] = value[0] + 2
+    if label[28] == '1':
+        value[0] = value[0] + 4
+    res += value[0] * 10000
+
+    return res
+
+
+def client_program():
+    angle = 0
+    cont = 0
+    done = False
+    host = '127.0.0.1'  # as both code is running on same pc
+    port = 5000  # socket server port number
+
+    client_socket = socket.socket()  # instantiate
+    client_socket.connect((host, port))  # connect to the server
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+        data = pickle.loads(client_socket.recv(8192))
+        if data[0:8] == ['0', '0', '0', '1', '0', '1', '0', '1']:
+            angle = simbologia(data)
+        screen.blit(background_image, background_position)
+        screen.blit(rotaciona_alt(seta10000, (angle * (-1) / 285)), background_position)
+        screen.blit(rotaciona_alt(seta1000, (angle * (-1) / 28)), background_position)
+        screen.blit(rotaciona_alt(seta100, (angle * (-1) / 2.75) + 375), background_position)
+        cont += 1
+        pygame.display.flip()
+        clock.tick(1000)
+
+        if cont == 40000:
             done = True
-
-    # Copy image to screen:
-    screen.blit(background_image, background_position)
-    screen.blit(rotaciona_alt(seta3, angle), background_position)
-    screen.blit(rotaciona_alt(seta1, angle), background_position)
-    screen.blit(rotaciona_alt(seta2, angle), background_position)
-
-    # Get the current mouse position. This returns the position
-    # as a list of two numbers.
-    #player_position = pygame.mouse.get_pos()
-    #x = player_position[0]
-    #y = player_position[1]
-
-    # Copy image to screen:
-    #screen.blit(player_image, [x, y])
-
-    # Draw the outline of a circle to 'sweep' the line around
-    #box_dimensions = [45, 2, 255, 255]
-    #pygame.draw.ellipse(screen, GREEN, box_dimensions, 2)
+    pygame.quit()
 
 
-    #x = 127.5 * math.sin(angle) + 171.5
-    #y = 127.5 * math.cos(angle) + 129.5
-    # Draw the line from the center to the calculated end spot
-    #pygame.draw.line(screen, WHITE, [171.5, 129.5], [x, y], 6)
-    #screen.blit(seta1, [x, y])
+if __name__ == '__main__':
+    pygame.init()
 
+    # 400x400 sized screen
+    screen = pygame.display.set_mode([600, 600])
 
-    velocidade = 100
+    # This sets the name of the window
+    pygame.display.set_caption('Altimetro')
 
-    """
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_UP]:
-        if descendo == True:
-            if velocidade - 10 == 0:
-                velocidade = 10;
-                descendo = False
-                angle = angle - .01
-        else:
-            velocidade -= 10
-            angle = angle + .01
-    else:
-        if descendo == True:
-            angle = angle - .01    # Decrease the angle by 0.03 radians
-            #flag = 1;
-        else:
-            angle = angle + .01
+    clock = pygame.time.Clock()
+    background_position = [0, 0]
 
-    if keys[pygame.K_DOWN]:
-        velocidade += 10
-    else:
-        if flag == 0:
-            angle = angle - .01    # Decrease the angle by 0.03 radians
-            flag = 1;"""
-
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_UP]:
-        angle = angle + .1
-        descendo = False
-    elif keys[pygame.K_DOWN]:
-        angle = angle - .1
-        descendo = True
-    elif descendo == True:
-        angle = angle - .1
-    else:
-        angle = angle + .1
-    # If we have done a full sweep, reset the angle to 0
-    if angle > 2 * PI:
-        angle = angle - 2 * PI
-
-    pygame.display.flip()
-    clock.tick(velocidade)
-
-pygame.quit()
+    # Load and set up graphics.
+    background_image = pygame.image.load("background_altimeter.png")  # .convert()
+    seta10000 = pygame.image.load("seta3.png")
+    seta1000 = pygame.image.load("seta1.png")
+    seta100 = pygame.image.load("seta2.png")
+    client_program()
