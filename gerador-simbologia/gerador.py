@@ -36,7 +36,7 @@ def server_program():
 
 if __name__ == '__main__':
     clock = pygame.time.Clock()
-    csv_inf = open("entrada_de_dados.csv")
+    csv_inf = open("entrada de dados_VSI.csv")
     file = csv.reader(csv_inf)
     inf = []
     for row in file:

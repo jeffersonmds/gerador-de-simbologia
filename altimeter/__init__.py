@@ -4,7 +4,7 @@ import socket
 import pickle
 
 
-def rotaciona_vsi(image, angle):
+def rotaciona_alt(image, angle):
     orig_rect = image.get_rect()
     rot_image = pygame.transform.rotate(image, angle)
     rot_rect = orig_rect.copy()
@@ -15,9 +15,19 @@ def rotaciona_vsi(image, angle):
 
 def simbologia(label):
     res = 0
-    value = [0, 0, 0, 0]
+    value = [0, 0, 0, 0, 0]
     list(reversed(label))
-    """att = label[14:28]"""
+    """10 ao 13"""
+    if label[10] == '1':
+        value[4] = value[4] + 1
+    if label[11] == '1':
+        value[4] = value[4] + 2
+    if label[12] == '1':
+        value[4] = value[4] + 4
+    if label[13] == '1':
+        value[4] = value[4] + 8
+    res += value[4]
+
     if label[14] == '1':
         value[3] = value[3] + 1
     if label[15] == '1':
@@ -26,7 +36,7 @@ def simbologia(label):
         value[3] = value[3] + 4
     if label[17] == '1':
         value[3] = value[3] + 8
-    res += value[3]
+    res += value[3] * 10
 
     if label[18] == '1':
         value[2] = value[2] + 1
@@ -36,7 +46,7 @@ def simbologia(label):
         value[2] = value[2] + 4
     if label[21] == '1':
         value[2] = value[2] + 8
-    res += value[2] * 10
+    res += value[2] * 100
 
     if label[22] == '1':
         value[1] = value[1] + 1
@@ -46,7 +56,7 @@ def simbologia(label):
         value[1] = value[1] + 4
     if label[25] == '1':
         value[1] = value[1] + 8
-    res += value[1] * 100
+    res += value[1] * 1000
 
     if label[26] == '1':
         value[0] = value[0] + 1
@@ -54,15 +64,8 @@ def simbologia(label):
         value[0] = value[0] + 2
     if label[28] == '1':
         value[0] = value[0] + 4
-    res += value[0] * 1000
+    res += value[0] * 10000
 
-    res = res / 100
-    return res
-
-
-def negativ(label, res):
-    if label[29] == '1' and label[30] == '1':
-        res = res * (-1)
     return res
 
 
@@ -79,36 +82,39 @@ def client_program():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
-        data = pickle.loads(client_socket.recv(8192))
-        if data[0:8] == ['0', '0', '0', '1', '0', '0', '0', '0']:
-            angle = simbologia(data)
-            angle = negativ(data, angle)
-        screen.blit(background_image, background_position)
-        screen.blit(rotaciona_vsi(seta, angle * (-1)), background_position)
-        cont += 1
-        pygame.display.flip()
-        clock.tick(10000)
+            data = pickle.loads(client_socket.recv(8192))
+            if inf[cont][0:8] == ['0', '0', '0', '1', '0', '1', '0', '1']:
+                angle = simbologia(data)
+            screen.blit(background_image, background_position)
+            screen.blit(rotaciona_alt(seta10000, (angle * (-1) / 285)), background_position)
+            screen.blit(rotaciona_alt(seta1000, (angle * (-1) / 28)), background_position)
+            screen.blit(rotaciona_alt(seta100, (angle * (-1) / 2.75) + 375), background_position)
+            cont += 1
+            pygame.display.flip()
+            clock.tick(1000)
 
-        if cont == 40000:
-            done = True
-
+            if cont == 40000:
+                done = True
     pygame.quit()
-    client_socket.close()  # close the connection
 
 
 if __name__ == '__main__':
     pygame.init()
 
     # 400x400 sized screen
-    screen = pygame.display.set_mode([400, 400])
+    screen = pygame.display.set_mode([600, 600])
 
     # This sets the name of the window
-    pygame.display.set_caption('Indicador de Velocidade Vertical')
+    pygame.display.set_caption('Altimetro')
 
     clock = pygame.time.Clock()
     background_position = [0, 0]
 
     # Load and set up graphics.
-    background_image = pygame.image.load("indicador.png")  # .convert()
-    seta = pygame.image.load("seta_vsi.png")
+    background_image = pygame.image.load("background_altimeter.png")  # .convert()
+    seta10000 = pygame.image.load("seta3.png")
+    seta1000 = pygame.image.load("seta1.png")
+    seta100 = pygame.image.load("seta2.png")
     client_program()
+
+
